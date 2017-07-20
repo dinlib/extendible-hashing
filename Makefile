@@ -1,3 +1,4 @@
+.PHONY: hashing
 hashing:
 	gcc *.c -o hashing
 

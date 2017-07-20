@@ -1,64 +1,28 @@
 #include <stdio.h>
 #include <stdlib.h>
+#include <string.h>
 
-#define MAX_SIZE 12
+#include "bucket.h"
 
-typedef struct {
-    int prof;
-    int cont;
-    int chaves[MAX_SIZE];
-    int id;
-} BUCKET;
-
-typedef struct {
-    BUCKET *bucket_ref;
-} DIR_CELL;
-
-typedef struct {
-    int prof;
-    DIR_CELL *celulas;
-} DIRETORIO;
-
-void initialize(DIRETORIO* *dir){
-    DIR_CELL *cell;
-    BUCKET *bucket;
-
-    *dir = (DIRETORIO*) malloc(sizeof(DIRETORIO));
-    cell = (DIR_CELL*) malloc(sizeof(DIR_CELL));
-    bucket = (BUCKET*) malloc(sizeof(BUCKET));
-
-    bucket->prof = 0;
-    bucket->cont = 0;
-    bucket->id = 0;
-
-    cell->bucket_ref = bucket;
-    (*dir)->prof = 0;
-    (*dir)->celulas = cell;
-
-    printf("CONT = %d\n", cell->bucket_ref->cont); //Teste
-}
-
-int make_address(int key, int prof) {
-    int retval = 0;
-    int mask = 1;
-    int hashval = key;
-
-    for (int j = 0; j < prof; j++) {
-        retval = retval << 1;
-        int lowbit = hashval & mask;
-        retval = retval | lowbit;
-        hashval = hashval >> 1;
-        printf("HASH = %d | RET = %d\n", hashval, retval); //Teste
-    }
-    printf("RETVAL = %d\n", retval); //Teste
-    return retval;
+int get_index(unsigned int address, int prof) {
+    int n = 32 - prof;
+    return address >> n;
 }
 
 int main(int argc, const char *argv[]) {
-    DIRETORIO *principal;
+    char buffer[10];
+    // init_dir();
 
-    make_address(3,3); //Teste
-    initialize(&principal); //Teste
-    printf("ProfDir = %d | ProfBuck = %d\n", principal->prof, principal->celulas->bucket_ref->prof); //Teste
+    // while (fgets(buffer, 10, stdin)) {
+    //     buffer[strlen(buffer) - 1] = '\0';
+    //     int key = atoi(buffer);
+    //     op_add(key);
+    // }
+
+    unsigned int address = make_address(236997u, PROF_ADDRESS);
+    int index = get_index(address, 1);
+
+    printf("%d\n", index);
+
     return 0;
 }
