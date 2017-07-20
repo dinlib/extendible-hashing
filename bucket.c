@@ -3,6 +3,11 @@
 #include "constants.h"
 #include "bucket.h"
 
+#define TRUE 1
+#define FALSE 0
+
+void bk_split(BUCKET *bucket);
+
 DIRETORIO *dir;
 
 void init_dir() {
@@ -37,13 +42,31 @@ unsigned int make_address(unsigned int key, int prof) {
     return retval;
 }
 
-BUCKET * op_find(int key) {
-    int address = make_address(key, PROF_ADDRESS);
-    // if (address < dir->size)
-    //    BUCKET *found_bucket = dir->celulas[address]->bucket_ref;
+int bk_find(BUCKET *bucket, int key) {
+    for (int i = 0; i < bucket->cont; i++) {
+        if (bucket->chaves[i] == key)
+            return TRUE;
+    }
+    return FALSE;
 }
 
-void bk_add_key(BUCKET *bucket_found, int key) {}
+BUCKET * op_find(int key) {
+    unsigned int address = make_address(key, dir->prof);
+    BUCKET *found_bucket = dir->celulas[address].bucket_ref;
+    if (bk_find(found_bucket, key) == TRUE) return found_bucket;
+    return NULL;
+}
+
+void bk_add_key(BUCKET *bucket, int key) {
+    if (bucket->cont < MAX_BK_SIZE)
+        bucket->chaves[bucket->cont++] = key;
+    else {
+        bk_split(bucket);
+        op_add(key);
+    }
+}
+
+void bk_split(BUCKET *bucket) {}
 
 void op_add(int key) {
     BUCKET *bucket_found = op_find(key);
