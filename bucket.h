@@ -21,9 +21,7 @@ typedef struct {
 } DIRETORIO;
 
 void init_dir();
-unsigned int make_address(unsigned int key, int prof);
-BUCKET * op_find(int key);
-void bk_add_key(BUCKET *bucket_found, int key);
 void op_add(int key);
+void print_dir();
 
 #endif

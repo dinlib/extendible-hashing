@@ -11,6 +11,7 @@ int get_index(unsigned int address, int prof) {
 
 int main(int argc, const char *argv[]) {
     char buffer[10];
+
     init_dir();
 
     while (fgets(buffer, 10, stdin)) {
@@ -18,6 +19,8 @@ int main(int argc, const char *argv[]) {
         int key = atoi(buffer);
         op_add(key);
     }
+
+    print_dir();
 
     return 0;
 }
