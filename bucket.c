@@ -6,7 +6,7 @@
 
 int make_address(int key, int prof);
 int bk_find(BUCKET *bucket, int key);
-BUCKET * op_find(int key);
+int op_find(int key, BUCKET **bucket_found);
 void bk_split(BUCKET *bucket);
 void dir_double();
 void find_new_range(BUCKET *bucket, int *new_start, int *new_end);
@@ -18,7 +18,7 @@ DIRETORIO *dir;
 void print_dir() {
     printf("Directory:\n");
     for (int i = 0; i < dir->size; i++)
-        printf("dir[%d] = bucket #%d", i, dir->celulas[i].bucket_ref->id);
+        printf("dir[%d] = bucket #%d\n", i, dir->celulas[i].bucket_ref->id);
 
     printf("\n");
 }
@@ -39,6 +39,7 @@ void init_dir() {
     dir->prof = 0;
     dir->celulas = celulas;
     dir->size = 1;
+    dir->max_id = bucket->id;
 }
 
 int make_address(int key, int prof) {
@@ -63,11 +64,10 @@ int bk_find(BUCKET *bucket, int key) {
     return FALSE;
 }
 
-BUCKET * op_find(int key) {
+int op_find(int key, BUCKET **bucket_found) {
     int address = make_address(key, dir->prof);
-    BUCKET *found_bucket = dir->celulas[address].bucket_ref;
-    if (bk_find(found_bucket, key) == TRUE) return found_bucket;
-    return NULL;
+    *bucket_found = dir->celulas[address].bucket_ref;
+    return bk_find(*bucket_found, key);
 }
 
 void bk_add_key(BUCKET *bucket, int key) {
@@ -86,6 +86,7 @@ void bk_split(BUCKET *bucket) {
     BUCKET *new_bk = malloc(sizeof(BUCKET));
     BUCKET *end_new_bk = new_bk;
 
+    new_bk->id = ++dir->max_id;
     int new_start, new_end;
 
     find_new_range(bucket, &new_start, &new_end);
@@ -96,8 +97,8 @@ void bk_split(BUCKET *bucket) {
 }
 
 void op_add(int key) {
-    BUCKET *bucket_found = op_find(key);
-    if (bucket_found)
+    BUCKET *bucket_found;
+    if (!op_find(key, &bucket_found))
         bk_add_key(bucket_found, key);
 }
 
@@ -107,9 +108,9 @@ void dir_double() {
     new_dir->celulas = malloc(new_size * sizeof(DIR_CELL));
     new_dir->size = new_size;
 
-    for (int i = 0; i < dir->size - 1; i++) {
+    for (int i = 0; i < new_dir->size - 1; i++) {
         new_dir->celulas[2*i].bucket_ref = dir->celulas[i].bucket_ref;
-        new_dir->celulas[2*i+1].bucket_ref = dir->celulas[i+1].bucket_ref;
+        new_dir->celulas[2*i+1].bucket_ref = dir->celulas[i].bucket_ref;
     }
 
     free(dir);
@@ -139,13 +140,20 @@ void dir_ins_bucket(BUCKET *bucket, int start, int end) {
 }
 
 void redis_keys(BUCKET *bucket1, BUCKET *bucket2) {
-    int backup[bucket1->cont];
-    for (int i = 0; i < bucket1->cont; i++) {
+    int cont = bucket1->cont;
+    int *backup = malloc(sizeof(int) * cont);
+    
+    for (int i = 0; i < cont; i++) {
         backup[i] = bucket1->chaves[i];
         bucket1->chaves[i] = 0;
         bucket1->cont--;
     }
-    for (int i = 0; i < bucket1->cont; i++) {
+
+    for (int i = 0; i < cont; i++) {
         op_add(backup[i]);
+        print_dir();
+        break;
     }
+
+    free(backup);
 }

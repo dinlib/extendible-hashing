@@ -17,6 +17,7 @@ typedef struct {
 typedef struct {
     int prof;
     int size;
+    int max_id;
     DIR_CELL *celulas;
 } DIRETORIO;
 
