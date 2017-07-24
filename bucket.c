@@ -22,7 +22,7 @@ void print_dir() {
 
     for (int i = 0; i < dir->size; i++) {
         BUCKET * bk = dir->celulas[i].bucket_ref;
-        printf("\n== BUCKET #0 ==\n");
+        printf("\n== BUCKET #%d ==\n", bk->id);
         printf("#id = %d    prof = %d\n", bk->id, bk->prof);
         for (int j = 0; j < bk->cont; j++)
             printf("chaves[%d] = %d\n", j, bk->chaves[j]);
@@ -145,7 +145,7 @@ void find_new_range(BUCKET *bucket, int *new_start, int *new_end) {
 }
 
 void dir_ins_bucket(BUCKET *bucket, int start, int end) {
-    for (int j = start; j < end; j++)
+    for (int j = start; j <= end; j++)
         dir->celulas[j].bucket_ref = bucket;
 }
 
