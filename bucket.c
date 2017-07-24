@@ -15,7 +15,7 @@ void redis_keys(BUCKET *bucket1, BUCKET *bucket2);
 DIRETORIO *dir;
 
 void print_dir() {
-    
+
 }
 
 void init_dir() {
@@ -75,7 +75,7 @@ void bk_add_key(BUCKET *bucket, int key) {
 }
 
 void bk_split(BUCKET *bucket) {
-    if (bucket->prof == dir->prof) 
+    if (bucket->prof == dir->prof)
         dir_double();
 
     BUCKET *new_bk = malloc(sizeof(BUCKET));
@@ -101,7 +101,7 @@ void dir_double() {
     DIRETORIO *new_dir = malloc(sizeof(DIRETORIO));
     new_dir->celulas = malloc(new_size * sizeof(DIR_CELL));
     new_dir->size = new_size;
-    
+
     for (int i = 0; i < dir->size - 1; i++) {
         new_dir->celulas[2*i].bucket_ref = dir->celulas[i].bucket_ref;
         new_dir->celulas[2*i+1].bucket_ref = dir->celulas[i+1].bucket_ref;
@@ -117,7 +117,7 @@ void find_new_range(BUCKET *bucket, int *new_start, int *new_end) {
     int shared_address = make_address(bucket->chaves[0], bucket->prof);
     shared_address = shared_address << 1;
     shared_address = shared_address | mask;
-    
+
     int bits_to_fill = dir->prof - (bucket->prof + 1);
     *new_start = *new_end = shared_address;
 
@@ -134,5 +134,13 @@ void dir_ins_bucket(BUCKET *bucket, int start, int end) {
 }
 
 void redis_keys(BUCKET *bucket1, BUCKET *bucket2) {
-
+    int backup[bucket1->cont];
+    for (int i = 0; i < bucket1->cont; i++) {
+        backup[i] = bucket1->chaves[i];
+        bucket1->chaves[i] = 0;
+        bucket1->cont--;
+    }
+    for (int i = 0; i < bucket1->cont; i++) {
+        op_add(backup[i]);
+    }
 }
