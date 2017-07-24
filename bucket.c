@@ -16,7 +16,7 @@ void redis_keys(BUCKET *bucket1, BUCKET *bucket2, int start, int end);
 DIRETORIO *dir;
 
 void print_dir() {
-    printf("Directory:\n");
+    printf("Directory:\n#size = %d    prof = %d    n_buckets = %d\n\n", dir->size, dir->prof, dir->max_id+1);
     for (int i = 0; i < dir->size; i++)
         printf("dir[%d] = bucket #%d\n", i, dir->celulas[i].bucket_ref->id);
 
@@ -151,7 +151,7 @@ void dir_ins_bucket(BUCKET *bucket, int start, int end) {
 
 void redis_keys(BUCKET *bucket1, BUCKET *bucket2, int start, int end) {
     int cont = bucket1->cont;
-    int *backup = malloc(sizeof(int) * cont);
+    int backup[MAX_BK_SIZE];
     
     for (int i = 0; i < cont; i++) {
         backup[i] = bucket1->chaves[i];
@@ -166,6 +166,4 @@ void redis_keys(BUCKET *bucket1, BUCKET *bucket2, int start, int end) {
         else
             bucket2->chaves[bucket2->cont++] = backup[i];
     }
-
-    free(backup);
 }
