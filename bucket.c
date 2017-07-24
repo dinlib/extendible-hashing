@@ -1,4 +1,5 @@
 #include <stdlib.h>
+#include <stdio.h>
 #include "constants.h"
 
 #include "bucket.h"
@@ -15,7 +16,11 @@ void redis_keys(BUCKET *bucket1, BUCKET *bucket2);
 DIRETORIO *dir;
 
 void print_dir() {
-    
+    printf("Directory:\n");
+    for (int i = 0; i < dir->size; i++)
+        printf("dir[%d] = bucket #%d", i, dir->celulas[i].bucket_ref->id);
+
+    printf("\n");
 }
 
 void init_dir() {
