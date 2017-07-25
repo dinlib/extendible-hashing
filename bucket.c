@@ -20,13 +20,19 @@ void print_dir() {
     for (int i = 0; i < dir->size; i++)
         printf("dir[%d] = bucket #%d\n", i, dir->celulas[i].bucket_ref->id);
 
+    int *flags = malloc(sizeof(int) * dir->size);
+    for (int i = 0; i < dir->size; i++)
+        flags[i] = 0;
+
     for (int i = 0; i < dir->size; i++) {
         BUCKET * bk = dir->celulas[i].bucket_ref;
-        printf("\n== BUCKET #%d ==\n", bk->id);
-        printf("#id = %d    prof = %d\n", bk->id, bk->prof);
-        for (int j = 0; j < bk->cont; j++)
-            printf("chaves[%d] = %d\n", j, bk->chaves[j]);
-
+        if (flags[bk->id] == 0) {
+            flags[bk->id] = 1;
+            printf("\n== BUCKET #%d ==\n", bk->id);
+            printf("#id = %d    prof = %d\n", bk->id, bk->prof);
+            for (int j = 0; j < bk->cont; j++)
+                printf("chaves[%d] = %d\n", j, bk->chaves[j]);
+        }
     }
 
     printf("\n");
@@ -89,13 +95,10 @@ void bk_add_key(BUCKET *bucket, int key) {
 }
 
 void bk_split(BUCKET *bucket) {
-    if (bucket->prof == dir->prof) {
+    if (bucket->prof == dir->prof)
         dir_double();
-    }
 
-    BUCKET *new_bk;
-    new_bk = malloc(sizeof(BUCKET));
-    BUCKET *end_new_bk = new_bk;
+    BUCKET *new_bk = malloc(sizeof(BUCKET));
 
     new_bk->id = ++dir->max_id;
     int new_start, new_end;
@@ -143,7 +146,7 @@ void find_new_range(BUCKET *bucket, int *new_start, int *new_end) {
     int bits_to_fill = dir->prof - (bucket->prof + 1);
     *new_start = *new_end = shared_address;
 
-    for (int j = 1; j < bits_to_fill; j++) {
+    for (int j = 0; j < bits_to_fill; j++) {
         *new_start = *new_start << 1;
         *new_end = *new_end << 1;
         *new_end = *new_end | mask;
