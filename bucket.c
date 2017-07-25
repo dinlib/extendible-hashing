@@ -1,7 +1,7 @@
 #include <stdlib.h>
 #include <stdio.h>
-#include "constants.h"
 
+#include "constants.h"
 #include "bucket.h"
 
 int make_address(int key, int prof);
@@ -114,18 +114,19 @@ void op_add(int key) {
 
 void dir_double() {
     int new_size = dir->size * 2;
-    DIRETORIO *new_dir = malloc(sizeof(DIRETORIO));
-    new_dir->celulas = malloc(new_size * sizeof(DIR_CELL));
-    new_dir->size = new_size;
 
-    for (int i = 0; i < new_dir->size - 1; i++) {
-        new_dir->celulas[2*i].bucket_ref = dir->celulas[i].bucket_ref;
-        new_dir->celulas[2*i+1].bucket_ref = dir->celulas[i].bucket_ref;
+    DIR_CELL *celulas = malloc(new_size * sizeof(DIR_CELL));
+
+    for (int i = 0; i < dir->size; i++) {
+        celulas[2*i].bucket_ref = dir->celulas[i].bucket_ref;
+        celulas[2*i+1].bucket_ref = dir->celulas[i].bucket_ref;
     }
 
-    free(dir);
-    dir = new_dir;
+    dir->size = new_size;
     dir->prof++;
+
+    free(dir->celulas);
+    dir->celulas = celulas;
 }
 
 void find_new_range(BUCKET *bucket, int *new_start, int *new_end) {
@@ -162,8 +163,8 @@ void redis_keys(BUCKET *bucket1, BUCKET *bucket2, int start, int end) {
     for (int i = 0; i < cont; i++) {
         int address = make_address(backup[i], dir->prof);
         if (address > start && address < end)
-            bucket1->chaves[bucket1->cont++] = backup[i];
-        else
             bucket2->chaves[bucket2->cont++] = backup[i];
+        else
+            bucket1->chaves[bucket1->cont++] = backup[i];
     }
 }

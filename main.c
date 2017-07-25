@@ -11,7 +11,7 @@ int get_index(unsigned int address, int prof) {
 
 int main(int argc, const char *argv[]) {
     char buffer[10];
-    FILE *file = fopen("chaves.txt", "r");
+    FILE *file = fopen("chaves1.txt", "r");
     init_dir();
 
     while (fgets(buffer, 10, file)) {
