@@ -89,17 +89,20 @@ void bk_add_key(BUCKET *bucket, int key) {
 }
 
 void bk_split(BUCKET *bucket) {
-    if (bucket->prof == dir->prof)
+    if (bucket->prof == dir->prof) {
         dir_double();
+    }
 
-    BUCKET *new_bk = malloc(sizeof(BUCKET));
+    BUCKET *new_bk;
+    new_bk = malloc(sizeof(BUCKET));
     BUCKET *end_new_bk = new_bk;
 
     new_bk->id = ++dir->max_id;
     int new_start, new_end;
 
     find_new_range(bucket, &new_start, &new_end);
-    dir_ins_bucket(end_new_bk, new_start, new_end);
+    dir_ins_bucket(new_bk, new_start, new_end);
+    
     bucket->prof++;
     new_bk->prof = bucket->prof;
     new_bk->cont = 0;
@@ -114,18 +117,21 @@ void op_add(int key) {
 
 void dir_double() {
     int new_size = dir->size * 2;
-    DIRETORIO *new_dir = malloc(sizeof(DIRETORIO));
-    new_dir->celulas = malloc(new_size * sizeof(DIR_CELL));
-    new_dir->size = new_size;
+    DIR_CELL *new_cells;
+    new_cells = malloc(new_size * sizeof(DIR_CELL));
 
-    for (int i = 0; i < new_dir->size - 1; i++) {
-        new_dir->celulas[2*i].bucket_ref = dir->celulas[i].bucket_ref;
-        new_dir->celulas[2*i+1].bucket_ref = dir->celulas[i].bucket_ref;
+    for (int i = 0; i < dir->size; i++) {
+        new_cells[2*i].bucket_ref = dir->celulas[i].bucket_ref;
+        new_cells[2*i+1].bucket_ref = dir->celulas[i].bucket_ref;
     }
 
-    free(dir);
-    dir = new_dir;
+    DIR_CELL *old = dir->celulas;
+
     dir->prof++;
+    dir->size = new_size;
+    dir->celulas = new_cells;
+    
+    free(old);
 }
 
 void find_new_range(BUCKET *bucket, int *new_start, int *new_end) {
@@ -161,9 +167,9 @@ void redis_keys(BUCKET *bucket1, BUCKET *bucket2, int start, int end) {
 
     for (int i = 0; i < cont; i++) {
         int address = make_address(backup[i], dir->prof);
-        if (address > start && address < end)
-            bucket1->chaves[bucket1->cont++] = backup[i];
-        else
+        if (address >= start && address <= end)
             bucket2->chaves[bucket2->cont++] = backup[i];
+        else
+            bucket1->chaves[bucket1->cont++] = backup[i];
     }
 }
