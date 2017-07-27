@@ -4,11 +4,6 @@
 
 #include "bucket.h"
 
-int get_index(unsigned int address, int prof) {
-    int n = 32 - prof;
-    return address >> n;
-}
-
 int main(int argc, const char *argv[]) {
     char buffer[10];
     FILE *file = fopen("chaves.txt", "r");
