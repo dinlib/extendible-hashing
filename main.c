@@ -9,8 +9,8 @@ int main(int argc, const char *argv[]) {
     FILE *file = fopen("chaves.txt", "r");
     init_dir();
 
-    while (fgets(buffer, 10, file)) {
-        buffer[strlen(buffer) - 1] = '\0';
+    while (!feof(file)) {
+        fgets(buffer, 10, file);
         int key = atoi(buffer);
         op_add(key);
     }
