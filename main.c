@@ -17,8 +17,8 @@ int main(int argc, const char *argv[]) {
 
     init_dir(bk_size);
 
-    while (!feof(file)) {
-        fgets(buffer, 10, file);
+    while (!feof(stdin)) {
+        fgets(buffer, 10, stdin);
         key = atoi(buffer);
         op_add(key);
     }
