@@ -13,7 +13,8 @@ void find_new_range(BUCKET *bucket, int *new_start, int *new_end);
 void dir_ins_bucket(BUCKET *bucket, int new_start, int new_end);
 void redis_keys(BUCKET *bucket1, BUCKET *bucket2, int start, int end);
 
-DIRETORIO *dir;
+static DIRETORIO *dir;
+static int bk_size = 10;
 
 void print_dir() {
     printf("Directory:\n#size = %d    prof = %d    n_buckets = %d\n\n", dir->size, dir->prof, dir->max_id+1);
@@ -38,13 +39,15 @@ void print_dir() {
     printf("\n");
 }
 
-void init_dir() {
+void init_dir(int max_bk_size) {
+    bk_size = max_bk_size;
     DIR_CELL *celulas;
     BUCKET *bucket;
 
     dir = malloc(sizeof(DIRETORIO));
     celulas = malloc(sizeof(DIR_CELL));
     bucket = malloc(sizeof(BUCKET));
+    bucket->chaves = malloc(sizeof(int) * bk_size);
 
     bucket->prof = 0;
     bucket->cont = 0;
@@ -86,7 +89,7 @@ int op_find(int key, BUCKET **bucket_found) {
 }
 
 void bk_add_key(BUCKET *bucket, int key) {
-    if (bucket->cont < MAX_BK_SIZE)
+    if (bucket->cont < bk_size)
         bucket->chaves[bucket->cont++] = key;
     else {
         bk_split(bucket);
@@ -99,6 +102,7 @@ void bk_split(BUCKET *bucket) {
         dir_double();
 
     BUCKET *new_bk = malloc(sizeof(BUCKET));
+    new_bk->chaves = malloc(sizeof(int) * bk_size);
 
     new_bk->id = ++dir->max_id;
     int new_start, new_end;
@@ -160,7 +164,7 @@ void dir_ins_bucket(BUCKET *bucket, int start, int end) {
 
 void redis_keys(BUCKET *bucket1, BUCKET *bucket2, int start, int end) {
     int cont = bucket1->cont;
-    int backup[MAX_BK_SIZE];
+    int *backup = malloc(sizeof(int) * bk_size);
     
     for (int i = 0; i < cont; i++) {
         backup[i] = bucket1->chaves[i];
@@ -175,4 +179,6 @@ void redis_keys(BUCKET *bucket1, BUCKET *bucket2, int start, int end) {
         else
             bucket1->chaves[bucket1->cont++] = backup[i];
     }
+
+    free(backup);
 }

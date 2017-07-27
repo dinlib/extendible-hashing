@@ -6,12 +6,20 @@
 
 int main(int argc, const char *argv[]) {
     char buffer[10];
+    int bk_size, key;
     FILE *file = fopen("chaves.txt", "r");
-    init_dir();
+    
+    if (argc != 2) {
+        bk_size = 10;
+    } else {
+        bk_size = atoi(argv[argc-1]);
+    }
+
+    init_dir(bk_size);
 
     while (!feof(file)) {
         fgets(buffer, 10, file);
-        int key = atoi(buffer);
+        key = atoi(buffer);
         op_add(key);
     }
 

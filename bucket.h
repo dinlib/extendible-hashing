@@ -6,7 +6,7 @@
 typedef struct {
     int prof;
     int cont;
-    int chaves[MAX_BK_SIZE];
+    int *chaves;
     int id;
 } BUCKET;
 
