@@ -2,10 +2,7 @@ import random, sys
 
 x = int(sys.argv[1])
 
-out = set([])
+out = random.sample(range(0, x*2), x)
 
 for i in range(x):
-    out.add(random.randint(1, x))
-
-for i in range(len(out)):
-    print(i)
+    print(out[i])
